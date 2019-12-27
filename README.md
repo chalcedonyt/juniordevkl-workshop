@@ -1,6 +1,6 @@
 # Workshop
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/chalcedonyt/gcp-gke-workshop.git)
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/chalcedonyt/gcp-gke-workshop.git&tutorial=TUTORIAL.md)
 
 # Cloud Firestore Quickstart
 

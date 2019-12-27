@@ -63,15 +63,49 @@ Click **Next** to continue setting up the application.
 Before we deploy an application, we'll need to understand how it works. 
 The application is based on a [Firestore lab by Google Cloud](https://codelabs.developers.google.com/codelabs/firestore-web/#0) - read it to understand how to run the application.
 
-#### Creating a Firebase project
+INSERT ARCHITECTURE HERE.
+
+## Setting up Firebase and Firestore
+
+### Creating a Firebase project
 
 This application uses Firestore (which requires a Firebase project) to store its data.
 Open the Firebase console at https://console.firebase.google.com/ and Create a project, selecting the project that you have created. ***(Don't create a new project!)***
 
 Select the Blaze (Pay as you go) plan - don't worry, you should be staying well within the free tier in this lab.
 
-#### Create your Firestore Database
+### Create your Firestore Database
 
-Firestore is a managed NoSQL database on Google Cloud Platform.
+Firestore is a managed NoSQL database on Google Cloud Platform. Create a firestore database by clicking on Database > Create database from the right panel. 
 
-![alt text](tutorial-images/Firestore.png "Creating firebase instance")
+![alt text](https://raw.githubusercontent.com/chalcedonyt/gcp-gke-workshop/master/tutorial-images/Firestore.png "Creating firebase instance")
+
+* Select "Start in production mode", then choose a region (`asia-south1-a` is recommended).
+
+What's wrong with this?
+```bash
+firebase login
+```
+
+```bash
+firebase use --add
+```
+
+```bash
+firebase deploy --only firestore:indexes,firestore:rules
+```
+
+In the next step we'll be able to see what the application looks like.
+
+## 
+```bash
+firebase serve --only hosting
+```
+
+Deploying the application to the public
+
+## Deploying to Google App Engine
+
+So far our application only lives on our private Cloud Shell proxy, and will be deleted when we close Cloud Shell.
+
+Let's deploy to Google App Engine
