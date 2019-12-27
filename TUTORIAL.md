@@ -1,6 +1,5 @@
 # Deploying Applications
 
-
 ## How do apps get deployed?
 
 You have written your amazing app, how do you deploy it? This workshop covers a few common ways.
@@ -52,6 +51,8 @@ This shows other parameters you can pass to `gcloud projects`.
 
 
 ### Set your active project
+Configure the `gcloud` tool to use your current project. Replace PROJECT_ID with your project id below:
+
 ```bash
 gcloud config set project PROJECT_ID
 ```
@@ -65,7 +66,7 @@ The application is based on a [Firestore lab by Google Cloud](https://codelabs.d
 
 INSERT ARCHITECTURE HERE.
 
-## Setting up Firebase and Firestore
+## Setting up Firestore
 
 ### Creating a Firebase project
 
@@ -82,25 +83,20 @@ Firestore is a managed NoSQL database on Google Cloud Platform. Create a firesto
 
 * Select "Start in production mode", then choose a region (`asia-south1-a` is recommended).
 
-What's wrong with this?
+## Installing and previewing the application 
 ```bash
-firebase login
+npm install
 ```
 
 ```bash
-firebase use --add
+npm start
 ```
 
-```bash
-firebase deploy --only firestore:indexes,firestore:rules
-```
+Click the preview icon on the top right <walkthrough-web-preview-icon></walkthrough-web-preview-icon>
 
-In the next step we'll be able to see what the application looks like.
+This opens a public URL into port 8080 of your Cloud Shell by default.
 
-## 
-```bash
-firebase serve --only hosting
-```
+**Question**: Can you see the problem with this?
 
 Deploying the application to the public
 
@@ -108,4 +104,17 @@ Deploying the application to the public
 
 So far our application only lives on our private Cloud Shell proxy, and will be deleted when we close Cloud Shell.
 
-Let's deploy to Google App Engine
+Let's deploy to Google App Engine (GAE)
+
+GAE requires an `app.yaml` file to describe how GAE should deploy an application. <walkthrough-editor-open-file filePath="app.yaml">Open the file</walkthrough-editor-open-file> and look at it.
+
+Use the `gcloud` tool to deploy to GAE:
+```bash
+gcloud app deploy
+```
+
+Click **Next** after this completes.
+
+## Deploying to Cloud Run
+
+Wow, that was quick, wasn't it?
