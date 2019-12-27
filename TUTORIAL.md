@@ -115,6 +115,73 @@ gcloud app deploy
 
 Click **Next** after this completes.
 
-## Deploying to Cloud Run
+## How an App Engine app works.
 
 Wow, that was quick, wasn't it?
+
+Questions:
+* Why do you think `app.yaml` specified NodeJS 10?
+* There isn't much else. How do you think GAE is deploying the app?
+
+Next up - we'll deploy using Cloud Run.
+
+## Building a container, and deploying to Cloud Run.
+
+### Building the container
+Cloud Run works off containers. So we'll need to deploy our app as a container.
+
+Run the command below, replacing PROJECT_ID with your project id ({{project-id}})
+```bash
+gcloud builds submit --tag gcr.io/PROJECT_ID/app:v1
+```
+
+Let's break down the image name here (the value passed to `tag`):
+* gcr.io stands for Google Container Registry, a container repository hosted by GCP.
+* gcr.io/PROJECT_ID is a namespace automatically allocated to your project.
+* app:v1 is the image:tag that you have chosen.
+
+Click **Next** below to use your container in Cloud Run.
+
+## Deploying to Cloud Run
+
+```bash
+gcloud run deploy tasklist --image=gcr.io/junior-devops/app:v1
+```
+
+Where `tasklist` is the name we are giving to the service.
+
+* When asked for a target platform, choose Option 1 ["`Cloud Run (fully managed)`"]
+* When asked to enable the Cloud Run service, answer `y`.
+* When asked to specify a region, choose any region.
+
+This operation may take a while as the Cloud Run API is being enabled.
+
+You should see a message saying that
+```
+Service [tasklist] revision [REVISION] has been deployed and is serving 100 percent of traffic at [URL].
+```
+
+Note the URL that is generated. Opening it will show you the app.
+
+GAE and Cloud Run have really easy deployment strategies so far. But what if we needed more customization and control?
+
+## What Kubernetes does
+
+Kubernetes is a container orchestration engine.
+
+A Kubernetes **Cluster** comprises nodes (VMs). It deploys containers to these nodes to achieve things like:
+* Load-balancing
+* Secret management
+* Custom configuration
+
+Let's create our first Kubernetes cluster.
+
+```bash
+gcloud container clusters create my-cluster \
+  --region=asia-southeast1-a \
+  --num-nodes=1 \
+  --machine-type=g1-small \
+  --no-enable-cloud-logging \
+  --no-enable-cloud-monitoring \
+  --no-enable-stackdriver-kubernetes
+```
