@@ -1,4 +1,6 @@
-const Task = require('../models/task');
+const firestore = require('../db/firestore')
+
+const Tasks = firestore.collection('tasks')
 
 const sortTask = (a,b) => {
   const taskA = a.task.toLowerCase();
@@ -7,52 +9,54 @@ const sortTask = (a,b) => {
 }
 
 module.exports = {
-  findAll: function (req,res){
-    Task
-    .find({})
-    .then(result => {
-      result.sort(sortTask)
-      res.render('index', {tasks: result})
+  findAll: async (req, res) => {
+    const snapshot = await Tasks.get()
+    let tasks = []
+    if (!snapshot.empty) {
+      snapshot.docs.forEach(doc => {
+        const data = doc.data()
+        tasks.push({
+          _id: doc.id,
+          ...data
+        })
+      });
+    }
+    res.render('index', { tasks })
+  },
+
+  create: async (req, res) => {
+    const ref = await Tasks.doc().set(req.body)
+    res.json(req.body)
+  },
+
+  findOne: async (req, res) => {
+    const ref = await Tasks.doc(req.params.id).get()
+    const task = {
+      _id: ref.id,
+      ...ref.data()
+    }
+    res.render('edit', task)
+  },
+
+  complete: async (req, res) => {
+    const ref = Tasks.doc(req.params.id)
+    await ref.update({ completed: true })
+    res.json({})
+  },
+
+  deleteOne: async (req, res) => {
+    const ref = Tasks.doc(req.params.id)
+    await ref.delete()
+    res.json({})
+  },
+
+  updateName: async (req, res) => {
+    const ref = Tasks.doc(req.body._id)
+    await ref.update({ task: req.body.task })
+    res.json({
+      _id: req.body._id,
+      task: req.body.task
     })
-    .catch(err => res.json(err))
-  },
-
-  create: function(req,res){
-    Task
-    .create(req.body)
-    .then(result => {
-      // result.sort(sortTask)
-      res.json(result)
-    })
-    .catch(err => res.json(err));
-  },
-
-  findOne: function (req,res){
-    Task
-    .findOne({_id: req.params.id})
-    .then(result => res.render('edit', result))
-    .catch(err => res.json(err))
-  },
-
-  complete: function (req,res){
-    Task
-    .findOneAndUpdate({_id: req.params.id}, {completed: true})
-    .then(result => res.json(result))
-    .catch(err => res.json(err))
-  },
-
-  deleteOne: function (req,res){
-    Task
-    .remove({_id: req.params.id})
-    .then(result => res.json(result))
-    .catch(err => res.json(err))
-  },
-
-  updateName: function (req,res){
-    Task
-    .findOneAndUpdate({_id: req.body._id}, {task: req.body.task})
-    .then(result => res.json(result))
-    .catch(err => res.json(err))
   }
 }
 

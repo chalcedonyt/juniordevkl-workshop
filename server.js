@@ -4,18 +4,10 @@ const app = express();
 const bodyParser = require('body-parser')
 const path = require('path')
 const logger = require('morgan');
-const mongoose = require('mongoose');
+
 const exphbs = require('express-handlebars');
 const favicon = require('serve-favicon');
-
-
-//setting up database
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/practiceDB';
-mongoose.connect(MONGODB_URI);
-mongoose.Promise = global.Promise;
-const db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+const firestore = require('./db/firestore')
 
 //setting up morgan middleware
 app.use(logger('dev'));
