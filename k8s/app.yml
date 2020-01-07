@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: task-app
-          image: gcr.io/PROJECT_ID/app:v1
+          image: gcr.io/PROJECT_ID/app:v1.0.0
           imagePullPolicy: Always
           env:
           - name: 'PORT'
