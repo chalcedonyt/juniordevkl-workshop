@@ -49,15 +49,7 @@ gcloud projects --help
 
 This shows other parameters you can pass to `gcloud projects`.
 
-
-### Set your active project
-Configure the `gcloud` tool to use your current project. Replace PROJECT_ID with your project id below:
-
-```bash
-gcloud config set project PROJECT_ID
-```
-
-Click **Next** to continue setting up the application.
+Click **Next** and we'll continue setting up the application.
 
 ## Understanding the application
 
@@ -66,11 +58,11 @@ The application is based on a [Firestore lab by Google Cloud](https://codelabs.d
 
 INSERT ARCHITECTURE HERE.
 
-## Setting up Firestore
+## Setting up the data layer with Firestore
 
 ### Creating a Firebase project
 
-This application uses Firestore (which requires a Firebase project) to store its data.
+This application uses Firestore (which requires a Firebase project) to store its data. 
 Open the Firebase console at [https://console.firebase.google.com/](https://console.firebase.google.com/) and Create a project, selecting the project that you have created. ***(Don't create a new project!)***
 
 Select the Blaze (Pay as you go) plan - don't worry, you should be staying well within the free tier in this lab.
@@ -85,6 +77,8 @@ Firestore is a managed NoSQL database on Google Cloud Platform. Create a firesto
 
 * Select "Start in production mode", then choose a region (`asia-south1-a` is recommended).
 
+SERVICE ACCOUNT THING
+
 ## Installing and previewing the application 
 ```bash
 npm install
@@ -98,7 +92,10 @@ Click the preview icon on the top right <walkthrough-web-preview-icon></walkthro
 
 This opens a public URL into port 8080 of your Cloud Shell by default.
 
+
 **Question**: Can you see the problem with this?
+
+Press CTRL+C to terminate the current command (`npm start`).
 
 Deploying the application to the public
 
@@ -114,6 +111,30 @@ Use the `gcloud` tool to deploy to GAE:
 ```bash
 gcloud app deploy
 ```
+
+### Set your active project
+But whoops! Looks like we need to configure the current project.
+
+Configure the `gcloud` tool to use your current project. Replace PROJECT_ID with your project id below:
+
+```bash
+gcloud config set project PROJECT_ID
+```
+
+Then run `gcloud app deploy` again.
+
+Talk a little about the output.
+
+```
+descriptor:      [/home/chalcedonyt/juniordevkl-workshop/app.yaml]
+source:          [/home/chalcedonyt/juniordevkl-workshop]
+target project:  [jd-project-tim]
+target service:  [default]
+target version:  [20200107t234055]
+target url:      [https://jd-project-tim.appspot.com]
+```
+
+Explain traffic split
 
 Click **Next** after this completes.
 
@@ -134,27 +155,28 @@ Cloud Run works off containers. So we'll need to deploy our app as a container.
 
 Run the command below, replacing PROJECT_ID with your project id ({{project-id}})
 ```bash
-gcloud builds submit --tag gcr.io/PROJECT_ID/app:v1
+gcloud builds submit --tag gcr.io/PROJECT_ID/app:v1.0.0
 ```
 
 Let's break down the image name here (the value passed to `tag`):
 * gcr.io stands for Google Container Registry, a container repository hosted by GCP.
 * gcr.io/PROJECT_ID is a namespace automatically allocated to your project.
-* app:v1 is the image:tag that you have chosen.
+* app:v1.0.0 is the image:tag that you have chosen.
 
 Click **Next** below to use your container in Cloud Run.
 
 ## Deploying to Cloud Run
 
 ```bash
-gcloud run deploy tasklist --image=gcr.io/junior-devops/app:v1
+gcloud run deploy tasklist --image=gcr.io/junior-devops/app:v1.0.0
 ```
 
 Where `tasklist` is the name we are giving to the service.
 
 * When asked for a target platform, choose Option 1 ["`Cloud Run (fully managed)`"]
-* When asked to enable the Cloud Run service, answer `y`.
+* When asked to enable the Cloud Run API, answer `y`.
 * When asked to specify a region, choose any region.
+* When asked to allow "unauthenticated invocations", allow it.
 
 This operation may take a while as the Cloud Run API is being enabled.
 
@@ -187,3 +209,48 @@ gcloud container clusters create my-cluster \
   --no-enable-cloud-monitoring \
   --no-enable-stackdriver-kubernetes
 ```
+
+When you run this, you should get a warning similar to this:
+```
+ERROR: (gcloud.container.clusters.create) ResponseError: code=403, message=Kubernetes Engine API is not enabled for this project. Please ensure it is enabled in Google Cloud Console and try ag
+ain: visit https://console.cloud.google.com/apis/api/container.googleapis.com/overview?project=PROJECT_ID to do so.
+```
+
+Visit this link and enable the Kubernetes API. Run the command above again after it completes. 
+
+While we wait for the API to complete, let's talk about Kubernetes.
+
+## Container vs VM Quiz
+
+After the Kubernetes API has been enabled on your project, run the cluster creation command again:
+
+```bash
+gcloud container clusters create my-cluster \
+  --region=asia-southeast1-a \
+  --num-nodes=1 \
+  --machine-type=g1-small \
+  --no-enable-cloud-logging \
+  --no-enable-cloud-monitoring \
+  --no-enable-stackdriver-kubernetes
+```
+
+While that runs, let's take a bit of time to revise what we have learnt so far.
+
+QUIZ LINK
+
+Create the Deployment and Service.
+
+```bash
+kubectl apply -f k8s/app.yml
+```
+
+Next, create the Ingress.
+
+```bash
+kubectl apply -f k8s/ingress.yml
+```
+
+Ingress - takes a lot of time. 
+
+Explain about the UI. Show scaling
+
