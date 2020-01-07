@@ -71,9 +71,11 @@ INSERT ARCHITECTURE HERE.
 ### Creating a Firebase project
 
 This application uses Firestore (which requires a Firebase project) to store its data.
-Open the Firebase console at https://console.firebase.google.com/ and Create a project, selecting the project that you have created. ***(Don't create a new project!)***
+Open the Firebase console at [https://console.firebase.google.com/](https://console.firebase.google.com/) and Create a project, selecting the project that you have created. ***(Don't create a new project!)***
 
 Select the Blaze (Pay as you go) plan - don't worry, you should be staying well within the free tier in this lab.
+
+When prompted about Google Analytics, don't enable it for the project.
 
 ### Create your Firestore Database
 
