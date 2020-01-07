@@ -77,7 +77,7 @@ Firestore is a managed NoSQL database on Google Cloud Platform. Create a firesto
 
 * Select "Start in production mode", then choose a region (`asia-south1-a` is recommended).
 
-SERVICE ACCOUNT THING
+SERVICE ACCOUNT THING. Replace it IAM
 
 ## Installing and previewing the application 
 ```bash
@@ -239,6 +239,8 @@ While that runs, let's take a bit of time to revise what we have learnt so far.
 QUIZ LINK
 
 Create the Deployment and Service.
+
+Replace the `PROJECT_ID` in `k8s/app.yml`
 
 ```bash
 kubectl apply -f k8s/app.yml
