@@ -73,24 +73,63 @@ When prompted about Google Analytics, don't enable it for the project.
 
 Firestore is a managed NoSQL database on Google Cloud Platform. Create a firestore database by clicking on Database > Create database from the right panel. 
 
-![alt text](https://raw.githubusercontent.com/chalcedonyt/gcp-gke-workshop/master/tutorial-images/Firestore.png "Creating firebase instance")
+![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/Firestore.png "Creating firebase instance")
 
 * Select "Start in production mode", then choose a region (`asia-south1-a` is recommended).
 
-SERVICE ACCOUNT THING. Replace it IAM
+Next we will create the credentials so our app can connect to Firestore.
+
+## Creating a service account
+
+A service account is a common way to secure server-to-server communications. We'll create one, and generate a key against it and put it in our app.
+
+Go to [https://console.cloud.google.com/](Google Cloud Console) and either search for "Service Account", or go to IAM -> Service account using the sidebar.
+
+![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/iam1.png "Navigating to IAM->Service account")
+
+Click on "Create a service account".
+
+![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/iam2.png "Creating a service account")
+
+Give the service account a descriptive name, and click "Create".
+
+![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/iam3.png "Naming a service account")
+
+The next part is the most important. We want to grant the service account only the access that it needs. 
+
+## Granting service account access
+
+In the next dialog, search for the "Firebase Develop Admin" role. Then click "Continue"
+
+![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/iam4.png "Granting access")
+
+In the final step, download the service account key in JSON format. Save it (the filename doesn't matter) and open it.
+
+Open <walkthrough-editor-open-file filePath="juniordevkl-workshop/credentials/svc-account.json" text="credentials/svc-account.json"></walkthrough-editor-open-file> in your editor.
+
+You'll notice it currently has dummy values. Paste the content of the file you just downloaded into this file, then Save it.
+
+Your app should now be able to access Firestore!
 
 ## Installing and previewing the application 
+
+Install the dependencies of the app:
+
 ```bash
 npm install
 ```
+
+Then start the application:
 
 ```bash
 npm start
 ```
 
+The application has started in your Cloud Shell, but how do you actually view it?
+
 Click the preview icon on the top right <walkthrough-web-preview-icon></walkthrough-web-preview-icon>
 
-This opens a public URL into port 8080 of your Cloud Shell by default.
+This opens a public URL into your Cloud Shell on port 8080 (by default).
 
 
 **Question**: Can you see the problem with this?
@@ -103,9 +142,11 @@ Deploying the application to the public
 
 So far our application only lives on our private Cloud Shell proxy, and will be deleted when we close Cloud Shell.
 
+**Note**: The "port forwarding" concept from the previous step is an important one
+
 Let's deploy to Google App Engine (GAE)
 
-GAE requires an `app.yaml` file to describe how GAE should deploy an application. <walkthrough-editor-open-file filePath="app.yaml">Open the file</walkthrough-editor-open-file> and look at it.
+GAE requires an `app.yaml` file to describe how GAE should deploy an application. <walkthrough-editor-open-file filePath="juniordevkl-workshop/app.yaml" text="Open the file"></walkthrough-editor-open-file> and look at it.
 
 Use the `gcloud` tool to deploy to GAE:
 ```bash
@@ -168,7 +209,7 @@ Click **Next** below to use your container in Cloud Run.
 ## Deploying to Cloud Run
 
 ```bash
-gcloud run deploy tasklist --image=gcr.io/junior-devops/app:v1.0.0
+gcloud run deploy tasklist --image=gcr.io/PROJECT_ID/app:v1.0.0
 ```
 
 Where `tasklist` is the name we are giving to the service.
@@ -256,3 +297,44 @@ Ingress - takes a lot of time.
 
 Explain about the UI. Show scaling
 
+## Modifying a deployed app
+
+Although containers are **immutable** one of the main benefits of Kubernetes is its flexibility.
+
+In production it is a **bad practice** to build images with service account credentials in them! 
+
+With Kubernetes, we can instead **mount** confidential values (called Secrets) as volumes or environment variables into a running container.
+
+Create a secret from the service account key with this command:
+
+```bash
+kubectl create secret generic credential-secret --from-file=credentials/svc-account.json
+```
+
+```bash
+kubectl apply -f k8s/app-with-secret.yml
+```
+
+## Updating deployment image tags
+
+Let's try to rebuild the image WITHOUT the baked in credential.
+
+Delete the `credentials/svc-account.json` file from your code.
+
+Then build the image again, this time tagging it to app:v1.0.1 (instead of app:v1.0.0 like we did earlier).
+
+Remember to replace your project ID below:
+
+```bash
+gcloud builds submit --tag gcr.io/PROJECT_ID/app:v1.0.1
+```
+
+Update this tag into <walkthrough-editor-open-file filePath="k8s/app-with-secret.yml" text="k8s/app-with-secret.yml"></walkthrough-editor-open-file>
+
+Then run the `apply` command again:
+
+```bash
+kubectl apply -f k8s/app-with-secret.yml
+```
+
+Open the Kubernetes console - you'll notice that a "Rolling update" occurs. Verify that the app still runs!
