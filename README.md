@@ -11,3 +11,10 @@ Use the link below or open TUTORIAL.md .
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/chalcedonyt/juniordevkl-workshop.git&tutorial=TUTORIAL.md)
 
 Credits to https://github.com/m081779/express-handlebars-todo-list for the original todo demo.
+
+## Running the application
+
+Run `npm install` to install the app dependencies.
+Run `npm start` to start the application. 
+
+The application will run on port 3000 or the `PORT` variable.

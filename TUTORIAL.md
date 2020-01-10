@@ -1,115 +1,46 @@
-# Deploying Applications
+# JuniorDev KL LearnUp #1 - Deploying Applications
 
-## How do apps get deployed?
+By Timothy Teoh
 
-You have written your amazing app, how do you deploy it? This workshop covers a few common ways.
+## Welcome to the workshop!
 
-![alt text](https://storage.googleapis.com/appivo-websites/www/2017/12/5a7fa863-cloudnative.png "How do we deploy an app?")
+You have an amazing app, how do you deploy it? 
+This workshop covers a few common ways.
 
-Click the **Start** button to move to the next step.
+This sidebar walkthrough will contain helpful commands and links that go with the slides you see in front.
 
+Click the **Start** button WHEN PROMPTED to move to the next step. 
 
-## What is Cloud Shell?
+The slides will remind you where you should be in this walkthrough.
 
-Before we start, let's familiarize ourselves with the environment.
+## Your environment
 
-Cloud Shell is a free, serverless console for Google Cloud that comes packaged with key tools like:
-* The `gcloud` CLI (Command Line Interface), which executes commands in your Google Cloud project.
-* `git`, a tool to track changes in code, and distribute it.
+Here's an example of how this sidebar can help. 
 
-*** 
-
-Let's familiarize ourselves with the Cloud Shell environment. Click "Next" below.
-> **Note**: Some of these tips can be applied to most terminals you encounter, like MacOS Terminal or Windows Powershell!
-
-## Navigating the console
-
-Here's an example of a command you can execute. Either type in the command to your terminal, or click the <walkthrough-cloud-shell-icon></walkthrough-cloud-shell-icon> icon below
+Click the <walkthrough-cloud-shell-icon></walkthrough-cloud-shell-icon> icon in the code snippets below to paste them into your cloud shell.
 
 ```bash
 gcloud projects list
 ```
 
-* `gcloud` is the program you are running.
-* `projects` is a **parameter** to `gcloud`, and `list` is in turn a **parameter** to `projects`.
-
-### Options and arguments
-
-Try adding the `--help` option to the command from before:
-
 ```bash
 gcloud projects list --help
 ```
 
-You should see text explaining what this command does. `--help` is a common option you can use in many programs that explains commands and their parameters. Try executing
+Click **Next** when you are prompted to move to step 2.
+This will happen after setting up Firebase, creating a service acount, and downloading its key.
 
-```bash
-gcloud projects --help
-```
+## Copying the service account key into the application code
 
-This shows other parameters you can pass to `gcloud projects`.
+You should have downloaded a service account key in JSON format. 
 
-Click **Next** and we'll continue setting up the application.
-
-## Understanding the application
-
-Before we deploy an application, we'll need to understand how it works. 
-The application is based on a [Firestore lab by Google Cloud](https://codelabs.developers.google.com/codelabs/firestore-web/#0) - read it to understand how to run the application.
-
-INSERT ARCHITECTURE HERE.
-
-## Setting up the data layer with Firestore
-
-### Creating a Firebase project
-
-This application uses Firestore (which requires a Firebase project) to store its data. 
-Open the Firebase console at [https://console.firebase.google.com/](https://console.firebase.google.com/) and Create a project, selecting the project that you have created. ***(Don't create a new project!)***
-
-Select the Blaze (Pay as you go) plan - don't worry, you should be staying well within the free tier in this lab.
-
-When prompted about Google Analytics, don't enable it for the project.
-
-### Create your Firestore Database
-
-Firestore is a managed NoSQL database on Google Cloud Platform. Create a firestore database by clicking on Database > Create database from the right panel. 
-
-![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/Firestore.png "Creating firebase instance")
-
-* Select "Start in production mode", then choose a region (`asia-south1-a` is recommended).
-
-Next we will create the credentials so our app can connect to Firestore.
-
-## Creating a service account
-
-A service account is a common way to secure server-to-server communications. We'll create one, and generate a key against it and put it in our app.
-
-Go to [https://console.cloud.google.com/](Google Cloud Console) and either search for "Service Account", or go to IAM -> Service account using the sidebar.
-
-![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/iam1.png "Navigating to IAM->Service account")
-
-Click on "Create a service account".
-
-![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/iam2.png "Creating a service account")
-
-Give the service account a descriptive name, and click "Create".
-
-![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/iam3.png "Naming a service account")
-
-The next part is the most important. We want to grant the service account only the access that it needs. 
-
-## Granting service account access
-
-In the next dialog, search for the "Firebase Develop Admin" role. Then click "Continue"
-
-![alt text](https://raw.githubusercontent.com/chalcedonyt/juniordevkl-workshop/master/tutorial-images/iam4.png "Granting access")
-
-In the final step, download the service account key in JSON format. Save it (the filename doesn't matter) and open it.
+Save it (the filename doesn't matter) and open it.
 
 Open <walkthrough-editor-open-file filePath="juniordevkl-workshop/credentials/svc-account.json" text="credentials/svc-account.json"></walkthrough-editor-open-file> in your editor.
 
 You'll notice it currently has dummy values. Paste the content of the file you just downloaded into this file, then Save it.
 
-Your app should now be able to access Firestore!
+This will ensure that the application can connect to Firestore!
 
 ## Installing and previewing the application 
 
