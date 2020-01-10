@@ -19,7 +19,7 @@ spec:
   selector:
     matchLabels:
       app: todo-app
-  minReadySeconds: 15
+  replicas: 2
   template:
     metadata:
       labels:

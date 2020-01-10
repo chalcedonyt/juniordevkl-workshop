@@ -208,16 +208,20 @@ gcloud container clusters create my-cluster \
   --no-enable-stackdriver-kubernetes
 ```
 
-While that runs, let's take a bit of time to revise what we have learnt so far.
+[BREAK]
 
 ## Creating a Deployment and Service
 
 Create the Deployment and Service.
 
 Open <walkthrough-editor-open-file filePath="k8s/app.yml" text="k8s/app.yml"></walkthrough-editor-open-file>.
-Find the section that says `image: gcr.io/PROJECT_ID/app:v1.0.0`.
+Find the section that says 
+
+`image: gcr.io/PROJECT_ID/app:v1.0.0`.
 
 Replace your `PROJECT_ID` here.
+
+Then create the Deployment
 
 ```bash
 kubectl apply -f k8s/app.yml
@@ -229,9 +233,9 @@ Next, create an Ingress.
 kubectl apply -f k8s/ingress.yml
 ```
 
-Ingress - takes a lot of time. 
+Ingresses take a lot of time to deploy - can you guess why?
 
-Explain about the UI. Show scaling
+Let's talk about what just happened, then let's revise what we have learnt.
 
 ## Modifying a deployed app
 
@@ -247,30 +251,36 @@ Create a secret from the service account key with this command:
 kubectl create secret generic credential-secret --from-file=credentials/svc-account.json
 ```
 
+Verify that this was done:
 ```bash
-kubectl apply -f k8s/app-with-secret.yml
+kubectl describe secrets credential-secret
 ```
 
-## Updating deployment image tags
+Click Next to continue.
+
+## Deploying the image WITHOUT the baked in credential.
 
 Let's try to rebuild the image WITHOUT the baked in credential.
 
-Delete the `credentials/svc-account.json` file from your code.
+DELETE the `credentials/svc-account.json` file from your code.
 
-Then build the image again, this time tagging it to app:v1.0.1 (instead of app:v1.0.0 like we did earlier).
-
-Remember to replace your project ID below:
+Then build the image again, this time tagging it to `app:v1.0.1` (instead of app:v1.0.0 like we did earlier).
 
 ```bash
-gcloud builds submit --tag gcr.io/PROJECT_ID/app:v1.0.1
+docker build -t gcr.io/$PROJECT_ID/app:v1.0.1 .
+```
+```bash
+docker push gcr.io/$PROJECT_ID/app:v1.0.1
 ```
 
-Update this tag into <walkthrough-editor-open-file filePath="k8s/app-with-secret.yml" text="k8s/app-with-secret.yml"></walkthrough-editor-open-file>
+Next, look at <walkthrough-editor-open-file filePath="k8s/app-with-secret.yml" text="k8s/app-with-secret.yml"></walkthrough-editor-open-file>.
 
-Then run the `apply` command again:
+Replace PROJECT_ID in here, then apply it. Note that this file uses the new tag and creates a volume.
 
 ```bash
 kubectl apply -f k8s/app-with-secret.yml
 ```
 
 Open the Kubernetes console - you'll notice that a "Rolling update" occurs. Verify that the app still runs!
+
+**Question**: What do you think will happen if we don't mount the credential volume?
