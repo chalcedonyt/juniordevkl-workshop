@@ -21,7 +21,7 @@ module.exports = {
         })
       });
     }
-    res.render('index', { tasks })
+    res.render('index', { tasks, deployer: process.env.DEPLOYER || 'Local' })
   },
 
   create: async (req, res) => {

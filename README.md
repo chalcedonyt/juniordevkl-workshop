@@ -14,7 +14,10 @@ Credits to https://github.com/m081779/express-handlebars-todo-list for the origi
 
 ## Running the application
 
-Run `npm install` to install the app dependencies.
-Run `npm start` to start the application. 
+* A Firestore database is required to run this application. The service account key should be placed in `credentials/svc-account.json`.
+* Run `npm install` to install the app dependencies.
+* Run `npm start` to start the application. 
 
 The application will run on port 3000 or the `PORT` variable.
+
+The `DEPLOYER` variable (defaulting to "Local") can also be overridden and will display on the home page.

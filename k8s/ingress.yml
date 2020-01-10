@@ -8,5 +8,5 @@ spec:
       paths:
       - path: /*
         backend:
-          serviceName: task-service
+          serviceName: todo-service
           servicePort: 8080

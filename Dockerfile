@@ -15,6 +15,6 @@ RUN npm install
 
 # Copy local code to the container image.
 COPY . ./
-
+ENV DEPLOYER "Container"
 # Run the web service on container startup.
 CMD [ "npm", "start" ]

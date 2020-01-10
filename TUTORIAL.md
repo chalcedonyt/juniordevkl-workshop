@@ -27,7 +27,23 @@ gcloud projects list
 gcloud projects list --help
 ```
 
+Before we proceed, we will be using your project ID a lot, so let's export it as a variable.
+
+Replace `[PROJECT_ID]` below with your actual project ID. This command sets a variable in your shell.
+
+```bash
+export PROJECT_ID=[PROJECT ID]
+```
+
+Test it by echoing the value:
+```bash
+echo $PROJECT_ID
+```
+
+Now `$PROJECT_ID` can be used to refer to your project ID.
+
 Click **Next** when you are prompted to move to step 2.
+
 This will happen after setting up Firebase, creating a service acount, and downloading its key.
 
 ## Copying the service account key into the application code
@@ -44,7 +60,9 @@ This will ensure that the application can connect to Firestore!
 
 ## Installing and previewing the application 
 
-Install the dependencies of the app:
+Developers usually place install and running instructions in  <walkthrough-editor-open-file filePath="juniordevkl-workshop/README.md" text="the README.md file"></walkthrough-editor-open-file>.
+
+We have already replaced the service account credential. Now install the dependencies:
 
 ```bash
 npm install
@@ -62,12 +80,7 @@ Click the preview icon on the top right <walkthrough-web-preview-icon></walkthro
 
 This opens a public URL into your Cloud Shell on port 8080 (by default).
 
-
 **Question**: Can you see the problem with this?
-
-Press CTRL+C to terminate the current command (`npm start`).
-
-Deploying the application to the public
 
 ## Deploying to Google App Engine
 
@@ -87,15 +100,19 @@ gcloud app deploy
 ### Set your active project
 But whoops! Looks like we need to configure the current project.
 
-Configure the `gcloud` tool to use your current project. Replace PROJECT_ID with your project id below:
+Configure the `gcloud` tool to use your current project:
 
 ```bash
-gcloud config set project PROJECT_ID
+gcloud config set project $PROJECT_ID
 ```
 
 Then run `gcloud app deploy` again.
 
-Talk a little about the output.
+What do you think the progress output means?
+
+### After deploying 
+
+Note the `target url` that appears after this completes, and open it in your browser.
 
 ```
 descriptor:      [/home/chalcedonyt/juniordevkl-workshop/app.yaml]
@@ -106,69 +123,78 @@ target version:  [20200107t234055]
 target url:      [https://jd-project-tim.appspot.com]
 ```
 
-Explain traffic split
-
-Click **Next** after this completes.
-
-## How an App Engine app works.
-
-Wow, that was quick, wasn't it?
-
-Questions:
-* Why do you think `app.yaml` specified NodeJS 10?
-* There isn't much else. How do you think GAE is deploying the app?
-
-Next up - we'll deploy using Cloud Run.
-
 ## Building a container, and deploying to Cloud Run.
 
-### Building the container
-Cloud Run works off containers. So we'll need to deploy our app as a container.
+### Building the container image from a Dockerfile.
 
-Run the command below, replacing PROJECT_ID with your project id ({{project-id}})
+A **Dockerfile** specifies how a container image is built. 
+
+Open the <walkthrough-editor-open-file filePath="Dockerfile" text="Dockerfile"></walkthrough-editor-open-file> in the project and look at it.
+
+What do you think the directives mean?
+
+Run this command to build the **container image**.
+
 ```bash
-gcloud builds submit --tag gcr.io/PROJECT_ID/app:v1.0.0
+docker build -t app:v1.0.0 .
+```
+
+Remember that containers are **portable**. We can even run this one locally!
+
+Use this command:
+
+```bash
+docker run -p 3000:3000 app:v1.0.0
+```
+
+Then do the preview again <walkthrough-web-preview-icon></walkthrough-web-preview-icon> to view the app.
+
+Note that the DEPLOYER value has changed to the one from the Dockerfile.
+
+Click Next to proceed.
+
+## Deploying to Cloud Run
+
+To submit our image from our local Cloud Shell to the cloud, we must indicate that we want to push it to Google Container Registry, under our project.
+
+Run this command to create an alias of `app:v1.0.0`:
+```bash
+docker tag app:v1.0.0 gcr.io/$PROJECT_ID/app:v1.0.0
+```
+
+Then push it to GCR (Google Container Registry):
+```bash
+docker push gcr.io/$PROJECT_ID/app:v1.0.0
 ```
 
 Let's break down the image name here (the value passed to `tag`):
-* gcr.io stands for Google Container Registry, a container repository hosted by GCP.
-* gcr.io/PROJECT_ID is a namespace automatically allocated to your project.
-* app:v1.0.0 is the image:tag that you have chosen.
+* **gcr.io** stands for Google Container Registry, a container repository hosted by GCP.
+* **gcr.io/$PROJECT_ID** is a namespace automatically allocated to your project.
+* **app:v1.0.0** is the image:tag that you have chosen.
 
 Click **Next** below to use your container in Cloud Run.
 
 ## Deploying to Cloud Run
 
 ```bash
-gcloud run deploy tasklist --image=gcr.io/PROJECT_ID/app:v1.0.0
+gcloud run deploy todolist --image=gcr.io/$PROJECT_ID/app:v1.0.0 --set-env-vars=DEPLOYER=CloudRun --memory=128Mi
 ```
 
-Where `tasklist` is the name we are giving to the service.
+Where `todolist` is the name we are giving to the service.
 
 * When asked for a target platform, choose Option 1 ["`Cloud Run (fully managed)`"]
-* When asked to enable the Cloud Run API, answer `y`.
+* When asked to enable the Cloud Run API, answer `y`. This takes a while.
 * When asked to specify a region, choose any region.
 * When asked to allow "unauthenticated invocations", allow it.
 
-This operation may take a while as the Cloud Run API is being enabled.
-
 You should see a message saying that
 ```
-Service [tasklist] revision [REVISION] has been deployed and is serving 100 percent of traffic at [URL].
+Service [todolist] revision [REVISION] has been deployed and is serving 100 percent of traffic at [URL].
 ```
 
-Note the URL that is generated. Opening it will show you the app.
+Note the URL that is generated. Opening it will show you the app! Notice that we set the DEPLOYER environment variable when deploying the service.
 
-GAE and Cloud Run have really easy deployment strategies so far. But what if we needed more customization and control?
-
-## What Kubernetes does
-
-Kubernetes is a container orchestration engine.
-
-A Kubernetes **Cluster** comprises nodes (VMs). It deploys containers to these nodes to achieve things like:
-* Load-balancing
-* Secret management
-* Custom configuration
+## Creating the cluster
 
 Let's create our first Kubernetes cluster.
 
@@ -182,43 +208,22 @@ gcloud container clusters create my-cluster \
   --no-enable-stackdriver-kubernetes
 ```
 
-When you run this, you should get a warning similar to this:
-```
-ERROR: (gcloud.container.clusters.create) ResponseError: code=403, message=Kubernetes Engine API is not enabled for this project. Please ensure it is enabled in Google Cloud Console and try ag
-ain: visit https://console.cloud.google.com/apis/api/container.googleapis.com/overview?project=PROJECT_ID to do so.
-```
-
-Visit this link and enable the Kubernetes API. Run the command above again after it completes. 
-
-While we wait for the API to complete, let's talk about Kubernetes.
-
-## Container vs VM Quiz
-
-After the Kubernetes API has been enabled on your project, run the cluster creation command again:
-
-```bash
-gcloud container clusters create my-cluster \
-  --region=asia-southeast1-a \
-  --num-nodes=1 \
-  --machine-type=g1-small \
-  --no-enable-cloud-logging \
-  --no-enable-cloud-monitoring \
-  --no-enable-stackdriver-kubernetes
-```
-
 While that runs, let's take a bit of time to revise what we have learnt so far.
 
-QUIZ LINK
+## Creating a Deployment and Service
 
 Create the Deployment and Service.
 
-Replace the `PROJECT_ID` in `k8s/app.yml`
+Open <walkthrough-editor-open-file filePath="k8s/app.yml" text="k8s/app.yml"></walkthrough-editor-open-file>.
+Find the section that says `image: gcr.io/PROJECT_ID/app:v1.0.0`.
+
+Replace your `PROJECT_ID` here.
 
 ```bash
 kubectl apply -f k8s/app.yml
 ```
 
-Next, create the Ingress.
+Next, create an Ingress.
 
 ```bash
 kubectl apply -f k8s/ingress.yml

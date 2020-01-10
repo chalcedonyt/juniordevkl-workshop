@@ -1,1 +1,4 @@
 runtime: nodejs10
+env_variables:
+  DEPLOYER: 'App Engine'
+instance_class: 'F1'
